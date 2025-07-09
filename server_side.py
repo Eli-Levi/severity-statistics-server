@@ -1,12 +1,10 @@
 import json
 import os
-import pandas as pd
 import subprocess
-
+import sys
+import time
 
 log_path = "/var/log/syslog"
-severities_json = {"WARN": 0, "INFO": 0, "ERROR": 0}
-files_list =["warn.txt", "info.txt", "error.txt"]
 
 def run_local_command(command):
     try:
@@ -18,10 +16,12 @@ def run_local_command(command):
         print(f"Command '{command}' returned non-zero exit status {e.returncode}")
         print(f"Error output: {e.stderr}")
 
-def prepJsonFromFiles():
+def prepJsonFromFiles(files_list: list):
+    severities_json = {}
+    severities_json["timestamp"] = time.time()
     for file in files_list:
         severity_type = file.strip(".txt").upper()
-        absulute_file_path = os.getcwd() +"\\"+ file
+        absulute_file_path = os.path.join(os.getcwd(), file)
         severity_counter = 0
         with open(absulute_file_path, 'r') as severity_file: 
             content = severity_file.readlines()
@@ -31,15 +31,22 @@ def prepJsonFromFiles():
     return severities_json
 
 def createSeverityLogs():
-    for severity in severities_json.keys():
+    files_list = []
+    for severity in ["WARN", "ERROR", "INFO"]:
         file_name = severity.lower() + ".txt"
         files_list.append(file_name)
         run_local_command(f'grep {severity} {log_path} > {file_name}')
+    return files_list
 
 
 def main():
-    res = prepJsonFromFiles()
-
+    try:
+        files = createSeverityLogs()
+        resulting_json = prepJsonFromFiles(files) 
+        print(json.dumps(resulting_json))
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        # exit()
 
 
 if __name__ == "__main__":
