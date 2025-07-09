@@ -18,7 +18,7 @@ def run_local_command(command):
         print(f"Command '{command}' returned non-zero exit status {e.returncode}")
         print(f"Error output: {e.stderr}")
 
-def prepJsonFiles():
+def prepJsonFromFiles():
     for file in files_list:
         severity_type = file.strip(".txt").upper()
         absulute_file_path = os.getcwd() +"\\"+ file
@@ -38,7 +38,7 @@ def createSeverityLogs():
 
 
 def main():
-    res = prepJsonFiles()
+    res = prepJsonFromFiles()
 
 
 
