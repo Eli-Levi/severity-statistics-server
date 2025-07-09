@@ -43,6 +43,7 @@ def main():
     try:
         files = createSeverityLogs()
         resulting_json = prepJsonFromFiles(files) 
+        run_local_command("rm -f error.txt info.txt warn.txt")
         print(json.dumps(resulting_json))
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
