@@ -19,8 +19,10 @@ def append_to_csv(file_path, data):
 
 
 def main():
-	# user_pem = input("Write the absolute path to your pem file: ")
-	my_ssh = SshToServer(r"D:\Nadav course\Cloud\my-key-pair.pem", "13.51.195.198", "ubuntu")
+	user_pem = input("Write the absolute path to your pem file: ")
+	server_ip = input("Please type in the server's ip: ")
+	host_name = input("Please type in the user name: ")
+	my_ssh = SshToServer(user_pem, server_ip, host_name)
 	my_ssh.connect()
 	stdout, stderr = my_ssh.runRemoteCommand("python3 server_side.py")
 	if not stdout == "":
