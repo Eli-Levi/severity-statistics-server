@@ -16,34 +16,24 @@ def run_local_command(command):
         print(f"Command '{command}' returned non-zero exit status {e.returncode}")
         print(f"Error output: {e.stderr}")
 
-def prepJsonFromFiles(files_list: list):
-    severities_json = {}
-    severities_json["timestamp"] = time.time()
-    for file in files_list:
-        severity_type = file.strip(".txt").upper()
-        absulute_file_path = os.path.join(os.getcwd(), file)
-        severity_counter = 0
-        with open(absulute_file_path, 'r') as severity_file: 
-            content = severity_file.readlines()
-            for line in content:  
-                severity_counter += 1
-        severities_json[severity_type] = severity_counter
+def prepJsonFromFiles():
+    severities_json = {"timestamp": time.time()}
+    with open(log_path, 'r') as severities_log:
+        content = severities_log.readline()
+        severity_occurance = { "WARN": 0, "INFO": 0, "ERROR": 0}
+        while content:
+            for key in severity_occurance.keys():
+                returned_value = content.find(key)
+                if returned_value > 0:
+                    severity_occurance[key] += 1
+            content = severities_log.readline()      
+    severities_json.update(severity_occurance)
     return severities_json
-
-def createSeverityLogs():
-    files_list = []
-    for severity in ["WARN", "ERROR", "INFO"]:
-        file_name = severity.lower() + ".txt"
-        files_list.append(file_name)
-        run_local_command(f'grep {severity} {log_path} > {file_name}')
-    return files_list
 
 
 def main():
     try:
-        files = createSeverityLogs()
-        resulting_json = prepJsonFromFiles(files) 
-        run_local_command("rm -f error.txt info.txt warn.txt")
+        resulting_json = prepJsonFromFiles() 
         print(json.dumps(resulting_json))
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

@@ -25,7 +25,7 @@ def main():
 	my_ssh = SshToServer(user_pem, server_ip, host_name)
 	my_ssh.connect()
 	stdout, stderr = my_ssh.runRemoteCommand("python3 server_side.py")
-	if not stdout == "":
+	if stdout:
 		append_to_csv(os.path.join(os.getcwd(), "statistics.csv"), json.loads(stdout))
 	else:
 		print(stderr)
